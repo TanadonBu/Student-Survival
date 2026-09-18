@@ -1,0 +1,19 @@
+check_project · กลุ่ม 5
+  pages running
+    /page1    ✓                                                        10/10
+    /page2    ✓                                                        10/10
+    /page3    ✓                                                        10/10
+    /page4    ✓  extra page                                            bonus
+    /page5    ✓  extra page                                            bonus
+    /page6    ✓  extra page                                            bonus
+    /page7    ✓  extra page                                            bonus
+                                                                       30/30
+  Python foundations (pages/page*.py + models.py)
+    if / else            ✓  models.py, pages/page1.py, pages/page2.py …    7/7
+    loop (for / while)   ✓  models.py, pages/page1.py, pages/page2.py …    7/7
+    function (def)       ✓  34 found                                    7/7
+    class + method       ✓  models.py:StudentBudget                     9/9
+                                                                      30/30
+  given files unchanged .. ✓  app.py, storage.py, check_project.py, test_pages.py, base.html, _not_built.html
+  ----------------------------------------------------------------
+  automated score: 60 / 60   (+ teamwork & presentation 40, from your teacher)

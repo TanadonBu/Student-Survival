@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+.sv-account-hero{background:linear-gradient(135deg,#fff,#f4eee8);border:1px solid var(--line);border-radius:20px;padding:28px;margin-bottom:18px}
+.sv-account-hero h1{margin:0 0 7px;font-size:34px}.sv-account-hero p{margin:0;color:var(--muted)}
+.sv-account-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sv-account-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px}
+.sv-account-card h2{margin-top:0}.sv-account-card label{display:block;font-size:13px;font-weight:700;margin:12px 0}
+.sv-account-card input{box-sizing:border-box;width:100%;margin-top:6px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit}
+.sv-account-note{margin-top:16px;padding:14px 16px;background:#f8f5ef;border-radius:12px;color:var(--muted);font-size:13px}
+@media(max-width:700px){.sv-account-grid{grid-template-columns:1fr}.sv-account-hero h1{font-size:28px}}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="sv-account-hero">
+  <h1>🧭 เข้าสู่ Student Survival</h1>
+  <p>พื้นที่ส่วนตัวสำหรับบันทึกการใช้เงิน วางแผนวันต่อวัน และเตรียมเงินสำรองของนักศึกษา</p>
+</section>
+
+<div class="sv-account-grid">
+  <section class="sv-account-card">
+    <h2>เข้าสู่ระบบ</h2>
+    <p class="muted">กลับมาใช้แผนการเงินของคุณ</p>
+    <form method="post">
+      <input type="hidden" name="action" value="login">
+      <label>ชื่อผู้ใช้<input name="username" required autocomplete="username"></label>
+      <label>รหัสผ่าน<input type="password" name="password" required autocomplete="current-password"></label>
+      <button class="btn mm-primary" type="submit">เข้าใช้งาน</button>
+    </form>
+  </section>
+
+  <section class="sv-account-card">
+    <h2>สมัครสมาชิก</h2>
+    <p class="muted">สร้างบัญชีใหม่เพื่อเริ่มบันทึกข้อมูล</p>
+    <form method="post">
+      <input type="hidden" name="action" value="register">
+      <label>ชื่อผู้ใช้<input name="username" minlength="3" maxlength="30" required autocomplete="username"></label>
+      <label>รหัสผ่าน<input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
+      <button class="btn" type="submit">สร้างบัญชี</button>
+    </form>
+  </section>
+</div>
+
+<div class="sv-account-note">💡 <b>Student Survival</b> เน้นคำตอบที่นักศึกษาต้องใช้จริง: วันนี้ใช้ไปเท่าไร, เหลือใช้ต่อวันเท่าไร และถ้าใช้แบบนี้ต่อไป เงินจะพออีกกี่วัน</div>
+{% endblock %}
