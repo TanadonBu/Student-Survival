@@ -4,25 +4,34 @@ import calendar
 import json
 import os
 import storage
+from flask import session
 from models import StudentBudget
 
 TITLE = "Dashboard"
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESERVE_FILE = os.path.join(HERE, "emergency_reserve.json")
+DEFAULT_RESERVE = {"saved": 0.0, "target": 2000.0}
 
 
-def _load_reserve():
+def _user_items(username):
+    """เฉพาะรายการของ user ที่ login อยู่เท่านั้น (ไม่เห็นข้อมูลของ user คนอื่น)"""
+    return [i for i in storage.load() if i.get("username") == username]
+
+
+def _load_reserve(username):
     try:
         with open(RESERVE_FILE, encoding="utf-8") as file:
             data = json.load(file)
-        return max(float(data.get("saved", 0)), 0), max(float(data.get("target", 2000)), 1)
+        entry = data.get(username or "", DEFAULT_RESERVE) if isinstance(data, dict) else DEFAULT_RESERVE
+        return max(float(entry.get("saved", 0)), 0), max(float(entry.get("target", 2000)), 1)
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         return 0.0, 2000.0
 
 
 
 def build(query=None):
-    items = storage.load()
+    current_user = session.get("user")
+    items = _user_items(current_user)
     budget = StudentBudget(items)
     today = date.today()
     month = today.strftime("%Y-%m")
@@ -61,7 +70,7 @@ def build(query=None):
     status = "อยู่ในงบวันนี้" if today_spend <= daily_limit else "ใช้เกินงบวันนี้"
 
     recent = sorted(items, key=lambda x: (x.get("date", ""), x.get("description", "")), reverse=True)[:6]
-    reserve_saved, reserve_target = _load_reserve()
+    reserve_saved, reserve_target = _load_reserve(current_user)
     usable_after_reserve = max(budget.balance() - reserve_saved, 0)
     no_spend_days = sum(1 for amount in daily.values() if amount == 0)
     reserve_progress = min(reserve_saved / reserve_target * 100, 100) if reserve_target > 0 else 0

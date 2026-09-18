@@ -1,14 +1,20 @@
 """Spending analysis page for Student Survival."""
 from datetime import date
 import storage
+from flask import session
 from models import StudentBudget
 
 TITLE = "วิเคราะห์"
 CATEGORIES = ["อาหาร", "เดินทาง", "การเรียน", "ที่พัก", "ความบันเทิง", "สุขภาพ", "อื่น ๆ"]
 
 
+def _user_items(username):
+    """เฉพาะรายการของ user ที่ login อยู่เท่านั้น (ไม่เห็นข้อมูลของ user คนอื่น)"""
+    return [i for i in storage.load() if i.get("username") == username]
+
+
 def build(query=None):
-    items = storage.load()
+    items = _user_items(session.get("user"))
     budget = StudentBudget(items)
     totals = budget.category_totals()
     total = sum(totals.values())

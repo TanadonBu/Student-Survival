@@ -3,6 +3,7 @@ from datetime import date
 import json
 import os
 import storage
+from flask import session
 from models import StudentBudget
 
 TITLE = "การเงิน"
@@ -12,24 +13,39 @@ RESERVE_FILE = os.path.join(HERE, "emergency_reserve.json")
 DEFAULT_TARGET = 2000.0
 
 
-def _load_reserve():
+def _user_items(username):
+    """เฉพาะรายการของ user ที่ login อยู่เท่านั้น (ไม่เห็นข้อมูลของ user คนอื่น)"""
+    return [i for i in storage.load() if i.get("username") == username]
+
+
+def _load_reserve(username):
     try:
         with open(RESERVE_FILE, encoding="utf-8") as file:
             data = json.load(file)
-        return max(float(data.get("saved", 0)), 0), max(float(data.get("target", DEFAULT_TARGET)), 1)
+        entry = data.get(username or "", {}) if isinstance(data, dict) else {}
+        return max(float(entry.get("saved", 0)), 0), max(float(entry.get("target", DEFAULT_TARGET)), 1)
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         return 0.0, DEFAULT_TARGET
 
 
-def _save_reserve(saved, target):
+def _save_reserve(username, saved, target):
+    try:
+        with open(RESERVE_FILE, encoding="utf-8") as file:
+            data = json.load(file)
+        if not isinstance(data, dict):
+            data = {}
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        data = {}
+    data[username or ""] = {"saved": round(saved, 2), "target": round(target, 2)}
     with open(RESERVE_FILE, "w", encoding="utf-8") as file:
-        json.dump({"saved": round(saved, 2), "target": round(target, 2)}, file, ensure_ascii=False, indent=2)
+        json.dump(data, file, ensure_ascii=False, indent=2)
 
 
 def build(query=None):
-    items = storage.load()
+    current_user = session.get("user")
+    items = _user_items(current_user)
     budget = StudentBudget(items)
-    reserve_saved, reserve_target = _load_reserve()
+    reserve_saved, reserve_target = _load_reserve(current_user)
     average = budget.average_daily_expense(7)
     recommended = max(DEFAULT_TARGET, average * 7)
     reserve_gap = max(reserve_target - reserve_saved, 0)
@@ -52,7 +68,10 @@ def build(query=None):
 
 def handle(form):
     action = str(form.get("action", "")).strip()
-    items = storage.load()
+    if action not in {"add", "delete", "reserve"}:
+        return ""
+    current_user = session.get("user")
+    all_items = storage.load()
 
     if action == "add":
         try:
@@ -68,24 +87,27 @@ def handle(form):
         if category not in CATEGORIES:
             category = "อื่น ๆ"
         note = str(form.get("description", "")).strip()[:80]
-        items.append({
+        all_items.append({
             "date": form.get("date") or date.today().isoformat(),
             "type": transaction_type,
             "category": category,
             "amount": amount,
             "description": note,
+            "username": current_user,
         })
-        storage.save(items)
+        storage.save(all_items)
         return "เพิ่มรายการเรียบร้อย"
 
     if action == "delete":
         try:
             index = int(form.get("index", -1))
-            ordered = sorted(items, key=lambda x: (x.get("date", ""), x.get("description", "")), reverse=True)
+            # ดัชนีอ้างอิงจากรายการที่ผู้ใช้คนนี้เห็นเท่านั้น เพื่อไม่ให้ลบข้อมูลของ user อื่น
+            own_items = [i for i in all_items if i.get("username") == current_user]
+            ordered = sorted(own_items, key=lambda x: (x.get("date", ""), x.get("description", "")), reverse=True)
             if 0 <= index < len(ordered):
                 target = ordered[index]
-                items.remove(target)
-                storage.save(items)
+                all_items.remove(target)
+                storage.save(all_items)
                 return "ลบรายการแล้ว"
         except (TypeError, ValueError):
             pass
@@ -99,7 +121,7 @@ def handle(form):
             return "กรุณากรอกเงินสำรองและเป้าหมายเป็นตัวเลข"
         if saved < 0 or target <= 0:
             return "เงินสำรองต้องไม่ติดลบ และเป้าหมายต้องมากกว่า 0"
-        _save_reserve(saved, target)
+        _save_reserve(current_user, saved, target)
         return "อัปเดตเงินสำรองฉุกเฉินแล้ว"
 
     return ""
