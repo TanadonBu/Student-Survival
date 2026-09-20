@@ -1,0 +1,101 @@
+[
+  {
+    "date": "2026-09-18",
+    "type": "expense",
+    "category": "อาหาร",
+    "amount": 55,
+    "description": "ข้าวกลางวัน",
+    "id": "7d01a5a10bb24e179595c4b37015d46a",
+    "username": "mudeng"
+  },
+  {
+    "date": "2026-09-18",
+    "type": "expense",
+    "category": "เดินทาง",
+    "amount": 40,
+    "description": "รถโดยสาร",
+    "id": "eb58029227f34bf6bb2de24cdf848596",
+    "username": "mudeng"
+  },
+  {
+    "date": "2026-09-17",
+    "type": "expense",
+    "category": "การเรียน",
+    "amount": 120,
+    "description": "อุปกรณ์เรียน",
+    "id": "d7c8ec85f6f04acb8b9d106255314f59",
+    "username": "mudeng"
+  },
+  {
+    "date": "2026-09-17",
+    "type": "expense",
+    "category": "อาหาร",
+    "amount": 65,
+    "description": "อาหารเย็น",
+    "id": "d8aefa9e00d847c09304ff2c292d74b2",
+    "username": "mudeng"
+  },
+  {
+    "date": "2026-09-16",
+    "type": "expense",
+    "category": "ความบันเทิง",
+    "amount": 90,
+    "description": "กิจกรรมกับเพื่อน",
+    "id": "f0582df496274cc49a9c4abdbcf9de2d",
+    "username": "mudeng"
+  },
+  {
+    "date": "2026-09-15",
+    "type": "expense",
+    "category": "เดินทาง",
+    "amount": 35,
+    "description": "รถโดยสาร",
+    "id": "428374b2302e4e0e9c2e1586783b4e77",
+    "username": "mudeng"
+  },
+  {
+    "date": "2026-09-14",
+    "type": "expense",
+    "category": "อาหาร",
+    "amount": 70,
+    "description": "อาหารกลางวัน",
+    "id": "ef57e1d584c54179a69aa78a77bdcf3b",
+    "username": "mudeng"
+  },
+  {
+    "date": "2026-09-13",
+    "type": "expense",
+    "category": "การเรียน",
+    "amount": 80,
+    "description": "เอกสารเรียน",
+    "id": "8ceb607cb6b843e9884e29e2aeaf6c43",
+    "username": "mudeng"
+  },
+  {
+    "date": "2026-09-12",
+    "type": "expense",
+    "category": "อาหาร",
+    "amount": 60,
+    "description": "อาหาร",
+    "id": "bf8d8bd0b7464765903a5962496141ce",
+    "username": "mudeng"
+  },
+  {
+    "date": "2026-09-01",
+    "type": "income",
+    "category": "เงินประจำเดือน",
+    "amount": 5000,
+    "description": "เงินจากผู้ปกครอง",
+    "id": "0641568a0cb44c19aef035fcf05f5395",
+    "username": "mudeng"
+  },
+  {
+    "date": "2026-09-05",
+    "type": "income",
+    "category": "งานเสริม",
+    "amount": 800,
+    "description": "งานพิเศษ",
+    "id": "6907ac4700914ce4a0c5ecd4fba23993",
+    "username": "mudeng"
+  }
+]

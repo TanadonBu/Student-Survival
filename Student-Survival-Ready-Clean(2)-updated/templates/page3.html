@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+.sp-hero{background:linear-gradient(135deg,#fff,#f6eee8);border:1px solid var(--line);border-radius:20px;padding:24px 26px;margin-bottom:14px}.sp-hero h1{margin:0 0 5px;font-size:30px}.sp-hero p{margin:0;color:var(--muted)}
+.sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sp-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:12px}.sp-panel h2{margin:0 0 14px;font-size:18px}.sp-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sp-form label{font-size:12px;font-weight:700}.sp-form input,.sp-form select{width:100%;box-sizing:border-box;padding:10px;margin-top:5px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}.sp-full{grid-column:1/-1}.sp-result{background:#f8f4ef;border-radius:13px;padding:14px;margin-top:12px}.sp-result strong{font-size:23px;color:var(--maroon)}
+.sp-allocation{display:grid;gap:10px}.sp-alloc{display:grid;grid-template-columns:85px 1fr 48px;align-items:center;gap:8px;font-size:12px}.sp-alloc input[type=range]{width:100%}.sp-alloc b{text-align:right}.sp-total{display:flex;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.sp-goal{margin-top:12px}.sp-goal-track{height:13px;background:#eee8e3;border-radius:99px;overflow:hidden;margin:8px 0}.sp-goal-track i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--maroon));border-radius:99px}.sp-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.sp-row:last-child{border-bottom:0}.sp-row small{display:block;color:var(--muted);margin-top:2px}.sp-income{color:#247a48}.sp-expense{color:#a32626}.sp-delete{border:0;background:transparent;color:#a32626;font-size:11px;cursor:pointer;padding:3px 0}.sp-note{font-size:12px;color:var(--muted)}
+@media(max-width:760px){.sp-grid,.sp-form{grid-template-columns:1fr}.sp-full{grid-column:auto}}
+</style>
+{% endblock %}
+{% block content %}
+<section class="sp-hero"><h1>🧪 ห้องวางแผนการอยู่รอด</h1><p>ทดลองสถานการณ์ก่อนใช้เงินจริง และปรับแผนให้เข้ากับชีวิตนักศึกษา</p></section>
+
+<div class="sp-grid">
+  <section class="sp-panel">
+    <h2>➕ บันทึกรายการ</h2>
+    <form method="post" class="sp-form">
+      <input type="hidden" name="action" value="add">
+      <label>ประเภท<select name="type"><option value="expense">รายจ่าย</option><option value="income">รายรับ</option></select></label>
+      <label>จำนวนเงิน<input name="amount" type="number" step="0.01" min="0.01" required placeholder="0.00"></label>
+      <label>หมวดหมู่<select name="category">{%for c in categories%}<option>{{c}}</option>{%endfor%}</select></label>
+      <label>วันที่<input name="date" type="date" max="{{ today_date }}"></label>
+      <label class="sp-full">รายละเอียด<input name="description" maxlength="80" placeholder="เช่น ค่าอาหารกลางวัน"></label>
+      <div class="sp-full"><button class="btn mm-primary" type="submit">บันทึกข้อมูล</button></div>
+    </form>
+  </section>
+
+  <section class="sp-panel">
+    <h2>🔮 ถ้าใช้เงินแบบนี้จะรอดไหม?</h2>
+    <p class="sp-note">ลองปรับยอดใช้ต่อวันและจำนวนวันที่ต้องอยู่ให้ถึง</p>
+    <div class="sp-form">
+      <label>เงินคงเหลือ<input id="simBalance" type="number" value="{{ '%.2f'|format(balance|float) }}" min="0" oninput="simulate()"></label>
+      <label>ใช้ต่อวัน<input id="simDaily" type="number" value="100" min="0" oninput="simulate()"></label>
+      <label>จำนวนวัน<input id="simDays" type="number" value="20" min="1" oninput="simulate()"></label>
+      <label>ผลลัพธ์<input id="simResult" readonly></label>
+    </div>
+    <div class="sp-result"><span id="simMessage">กำลังคำนวณ...</span></div>
+  </section>
+</div>
+
+<div class="sp-grid">
+  <section class="sp-panel">
+    <h2>🧩 แบ่งเงินก้อนนี้อย่างไร?</h2>
+    <p class="sp-note">ปรับสัดส่วนเอง ระบบจะคำนวณจากเงินคงเหลือให้ทันที</p>
+    <div class="sp-allocation">
+      <div class="sp-alloc"><span>🍚 อาหาร</span><input id="food" type="range" min="0" max="100" value="40" oninput="allocate()"><b id="foodVal">40%</b></div>
+      <div class="sp-alloc"><span>🚌 เดินทาง</span><input id="travel" type="range" min="0" max="100" value="20" oninput="allocate()"><b id="travelVal">20%</b></div>
+      <div class="sp-alloc"><span>📚 การเรียน</span><input id="study" type="range" min="0" max="100" value="20" oninput="allocate()"><b id="studyVal">20%</b></div>
+      <div class="sp-alloc"><span>🛟 สำรอง</span><input id="reserve" type="range" min="0" max="100" value="20" oninput="allocate()"><b id="reserveVal">20%</b></div>
+    </div>
+    <div class="sp-total"><b>รวม</b><b id="allocTotal">100%</b></div>
+    <div class="sp-note" id="allocMessage">สัดส่วนพอดีแล้ว</div>
+  </section>
+
+  <section class="sp-panel">
+    <h2>🛟 เงินสำรองฉุกเฉิน</h2>
+    <p class="sp-note">เงินส่วนนี้แยกจากงบใช้ประจำ เช่น เหตุจำเป็นหรือค่าใช้จ่ายที่คาดไม่ถึง</p>
+    <div class="sp-goal"><div class="sp-goal-track"><i style="width:{{ reserve_progress|float }}%"></i></div><div class="sp-total"><span>ความคืบหน้า</span><b>{{ "{:,.1f}".format(reserve_progress|float) }}%</b></div></div>
+    <div class="sp-row"><span>เงินสำรองปัจจุบัน</span><b>฿{{ "{:,.2f}".format(reserve_saved|float) }}</b></div>
+    <div class="sp-row"><span>เป้าหมายเงินสำรอง</span><b>฿{{ "{:,.2f}".format(reserve_target|float) }}</b></div>
+    <div class="sp-row"><span>ยังต้องเก็บเพิ่ม</span><b>฿{{ "{:,.2f}".format(reserve_gap|float) }}</b></div>
+    <form method="post" class="sp-form" style="margin-top:10px">
+      <input type="hidden" name="action" value="reserve">
+      <label>เงินสำรองที่มี<input name="reserve_saved" type="number" min="0" step="0.01" value="{{ '%.2f'|format(reserve_saved|float) }}"></label>
+      <label>เป้าหมาย<input name="reserve_target" type="number" min="1" step="0.01" value="{{ '%.2f'|format(reserve_target|float) }}"></label>
+      <div class="sp-full"><button class="btn mm-primary" type="submit">อัปเดตเงินสำรอง</button></div>
+    </form>
+    <p class="sp-note">ระบบแนะนำเป้าหมายอย่างน้อย ฿{{ "{:,.0f}".format(recommended_reserve|float) }} จากค่าใช้จ่ายเฉลี่ย 7 วัน</p>
+  </section>
+</div>
+
+<section class="sp-panel">
+  <h2>📋 จัดการรายการ</h2>
+  {% for x in items[:10] %}
+  <div class="sp-row">
+    <span><b>{{x.category}}</b><small>{{x.date}} · {{x.description or 'ไม่มีรายละเอียด'}}</small></span>
+    <span style="text-align:right"><b class="{{'sp-income' if x.type=='income' else 'sp-expense'}}">{{'+' if x.type=='income' else '-'}} ฿{{ "{:,.2f}".format(x.amount|float) }}</b><br>
+      <form method="post" style="display:inline"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ x.id }}"><button class="sp-delete" type="submit">ลบรายการ</button></form>
+    </span>
+  </div>
+  {% else %}<p class="sp-note">ยังไม่มีรายการ</p>{% endfor %}
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+function simulate(){const b=Number(document.getElementById('simBalance').value||0),d=Number(document.getElementById('simDaily').value||0),days=Number(document.getElementById('simDays').value||0),remain=b-d*days;document.getElementById('simResult').value='฿ '+remain.toFixed(2);document.getElementById('simMessage').textContent=remain>=0?'แผนนี้ยังเหลือ ฿ '+remain.toFixed(2)+' หลังครบ '+days+' วัน':'แผนนี้เงินไม่พอ ขาดประมาณ ฿ '+Math.abs(remain).toFixed(2);}
+function allocate(){const ids=['food','travel','study','reserve'];let total=0;ids.forEach(id=>{const input=document.getElementById(id);const v=Number(input.value);total+=v;input.style.setProperty('--value',v);document.getElementById(id+'Val').textContent=v+'%';});document.getElementById('allocTotal').textContent=total+'%';document.getElementById('allocMessage').textContent=total===100?'สัดส่วนพอดีแล้ว':(total>100?'เกิน 100% — ลดบางหมวดลง':'ยังแบ่งไม่ครบ 100%');}
+simulate();allocate();
+</script>
+{% endblock %}

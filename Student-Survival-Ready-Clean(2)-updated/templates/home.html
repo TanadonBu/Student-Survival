@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="modern-hero">
+  <div class="hero-copy">
+    <div class="eyebrow"><span class="pulse-dot"></span> STUDENT SURVIVAL · MONEY MATE</div>
+    <h1>จัดการเงินนักศึกษา<br><span>ให้ง่ายขึ้นในทุกวัน</span></h1>
+    <p>เว็บช่วยวางแผนการเงินสำหรับนักศึกษา ตั้งแต่บันทึกรายรับ–รายจ่าย วิเคราะห์พฤติกรรม ไปจนถึงวางเป้าหมายและเงินสำรองฉุกเฉิน</p>
+    <div class="hero-actions">
+      {% if current_user %}<a class="btn modern-primary" href="{{ url_for('page', name='page2') }}">เริ่มจัดการเงิน</a>
+      <a class="btn modern-secondary" href="{{ url_for('page', name='page3') }}">ดูแผนการเงิน</a>{% else %}
+      <a class="btn modern-primary" href="{{ url_for('page', name='page1') }}">เข้าสู่ระบบเพื่อใช้งาน</a>
+      <a class="btn modern-secondary" href="{{ url_for('page', name='page1') }}?view=register">สมัครสมาชิก</a>{% endif %}
+    </div>
+    <div class="hero-trust"><span>✓ ใช้งานง่าย</span><span>✓ เหมาะกับนักศึกษา</span><span>✓ ข้อมูลเป็นส่วนตัว</span></div>
+  </div>
+  <div class="dashboard-mock">
+    <div class="mock-top"><div><small>ยอดคงเหลือ</small><strong>฿8,450</strong></div><span class="mock-status">● พร้อมใช้งาน</span></div>
+    <div class="mock-grid"><div><small>วันนี้</small><b>฿320</b><em>ค่าใช้จ่าย</em></div><div><small>งบ/วัน</small><b>฿410</b><em class="good-text">เหลือ ฿90</em></div></div>
+    <div class="mock-chart"><div class="chart-label"><span>ค่าใช้จ่าย 7 วัน</span><b>↓ 12%</b></div><div class="bars"><i style="height:42%"></i><i style="height:65%"></i><i style="height:50%"></i><i style="height:78%"></i><i style="height:58%"></i><i style="height:34%"></i><i style="height:48%"></i></div></div>
+    <div class="mock-goal"><span class="goal-icon">🎯</span><div><small>เป้าหมายใหม่</small><b>เงินสำรองฉุกเฉิน</b></div><strong>68%</strong></div>
+  </div>
+</section>
+{% if not current_user %}<div class="login-required-note">🔒 ข้อมูลการเงินเป็นข้อมูลส่วนตัว กรุณาเข้าสู่ระบบก่อนเปิด Dashboard หรือเมนูอื่น</div>{% endif %}
+
+<section class="what-section">
+  <div class="section-heading"><span class="section-kicker">WHAT YOU CAN DO</span><h2>เว็บนี้ช่วยอะไรคุณได้บ้าง?</h2><p>รวมเครื่องมือสำคัญไว้ในที่เดียว เพื่อให้คุณเห็นภาพการเงินของตัวเองได้ชัดขึ้น</p></div>
+  <div class="feature-grid">
+    <a class="feature-card feature-main" href="{{ url_for('page', name='page2') }}"><div class="feature-icon">💰</div><div><span class="feature-number">01</span><h3>จัดการการเงิน</h3><p>บันทึกรายรับและรายจ่ายทีละรายการ พร้อมดูยอดคงเหลือและประวัติการใช้เงิน</p><span class="feature-link">เปิดการเงิน →</span></div></a>
+    <a class="feature-card" href="{{ url_for('page', name='page6') }}"><div class="feature-icon">📊</div><span class="feature-number">02</span><h3>วิเคราะห์การใช้เงิน</h3><p>มองเห็นหมวดที่ใช้จ่ายมาก และแนวโน้มการใช้เงินแบบเข้าใจง่าย</p><span class="feature-link">ดูการวิเคราะห์ →</span></a>
+    <a class="feature-card" href="{{ url_for('page', name='page3') }}"><div class="feature-icon">🧭</div><span class="feature-number">03</span><h3>วางแผนล่วงหน้า</h3><p>ทดลองคำนวณว่าใช้เงินต่อวันเท่าไรจึงจะอยู่ในงบที่ตั้งไว้</p><span class="feature-link">ทดลองแผน →</span></a>
+    <a class="feature-card" href="{{ url_for('page', name='page4') }}"><div class="feature-icon">☀️</div><span class="feature-number">04</span><h3>No-Spend Day</h3><p>ติดตามวันที่ไม่มีรายจ่าย เพื่อสร้างนิสัยการใช้เงินอย่างมีเป้าหมาย</p><span class="feature-link">วางแผนวันประหยัด →</span></a>
+    <a class="feature-card" href="{{ url_for('page', name='page5') }}"><div class="feature-icon">🛡️</div><span class="feature-number">05</span><h3>Emergency Reserve</h3><p>กำหนดเป้าหมายเงินสำรองฉุกเฉินและติดตามความคืบหน้าได้ง่าย</p><span class="feature-link">สร้างเงินสำรอง →</span></a>
+    <a class="feature-card" href="{{ url_for('page', name='page7') }}"><div class="feature-icon">🎯</div><span class="feature-number">06</span><h3>เป้าหมายการเงิน</h3><p>ตั้งเป้าหมายและดูว่าต้องเก็บเพิ่มอีกเท่าไรจึงจะถึงเป้าหมาย</p><span class="feature-link">ตั้งเป้าหมาย →</span></a>
+  </div>
+</section>
+
+<section class="how-section">
+  <div class="section-heading"><span class="section-kicker">HOW IT WORKS</span><h2>เริ่มต้นง่ายใน 3 ขั้นตอน</h2></div>
+  <div class="steps"><div class="step"><b>1</b><div><h3>บันทึก</h3><p>ใส่รายรับและรายจ่ายที่เกิดขึ้นจริง</p></div></div><div class="step"><b>2</b><div><h3>วิเคราะห์</h3><p>ดูว่าเงินของคุณกำลังไปอยู่ที่ไหน</p></div></div><div class="step"><b>3</b><div><h3>วางแผน</h3><p>ตั้งงบ เป้าหมาย และเงินสำรองให้เหมาะกับตัวเอง</p></div></div></div>
+</section>
+
+<section class="modern-cta"><div><span class="section-kicker">READY?</span><h2>เริ่มดูแลเงินของคุณตั้งแต่วันนี้</h2><p>ไม่ต้องรอให้เงินหมดก่อน แล้วค่อยเริ่มวางแผน</p></div><a class="btn cta-button" href="{{ url_for('page', name='page2') }}">เข้าสู่ Dashboard →</a></section>
+{% endblock %}
