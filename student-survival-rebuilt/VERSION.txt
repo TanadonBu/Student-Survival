@@ -1,5 +1,0 @@
-Student Survival FINAL
-Account-separated data
-No account page after login
-No Savings Challenge / Spending Streak
-Version 3.0 — rebuilt core, login required, stable record IDs

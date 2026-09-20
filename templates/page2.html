@@ -13,7 +13,7 @@
 </style>
 {% endblock %}
 {% block content %}
-<section class="db-hero"><h1>👋 สวัสดี! นักศึกษา ม.อุบล</h1><p>ขอให้วันนี้เป็นวันที่ดี และใช้เงินอย่างชาญฉลาดนะครับ ✨</p><div class="db-date">วันนี้ · {{ today_label }}</div></section>
+<section class="db-hero"><h1>👋 สวัสดี! {{ current_user or 'นักศึกษา ม.อุบล' }}</h1><p>ขอให้วันนี้เป็นวันที่ดี และใช้เงินอย่างชาญฉลาดนะครับ ✨</p><div class="db-date">วันนี้ · {{ today_label }}</div></section>
 
 <div class="db-stats">
   <div class="db-stat"><div class="icon">💳</div><span>เงินคงเหลือ</span><strong class="db-maroon">฿ {{ "{:,.2f}".format(balance|float) }}</strong><small>พร้อมวางแผนต่อ</small></div>

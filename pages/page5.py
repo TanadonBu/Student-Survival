@@ -1,5 +1,6 @@
 """Emergency Reserve dashboard for Student Survival."""
 import json
+import math
 import os
 import storage
 from flask import session
@@ -62,12 +63,17 @@ def build(query=None):
 def handle(form):
     if str(form.get("action", "")).strip() != "save":
         return ""
+    if not session.get("user"):
+        return "กรุณาเข้าสู่ระบบก่อนบันทึกข้อมูล"
     try:
         saved = float(form.get("saved", 0))
         target = float(form.get("target", DEFAULT_TARGET))
     except (TypeError, ValueError):
         return "กรุณากรอกจำนวนเงินเป็นตัวเลข"
-    if saved < 0 or target <= 0:
+    if not math.isfinite(saved) or not math.isfinite(target) or saved < 0 or target <= 0:
         return "เงินสำรองต้องไม่ติดลบ และเป้าหมายต้องมากกว่า 0"
+    balance = StudentBudget(_user_items(session.get("user"))).balance()
+    if saved > balance + 1e-9:
+        return f"เงินสำรองต้องไม่เกินเงินคงเหลือ ฿{balance:,.2f}"
     _save(session.get("user"), saved, target)
     return "อัปเดต Emergency Reserve แล้ว"

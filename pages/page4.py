@@ -74,11 +74,15 @@ def handle(form):
     if action != "record":
         return ""
     current_user = session.get("user")
+    if not current_user:
+        return "กรุณาเข้าสู่ระบบก่อนบันทึกข้อมูล"
     selected = str(form.get("date", "")).strip() or date.today().isoformat()
     try:
-        date.fromisoformat(selected)
+        selected_date = date.fromisoformat(selected)
     except ValueError:
         return "รูปแบบวันที่ไม่ถูกต้อง"
+    if selected_date > date.today():
+        return "ยังบันทึก No-Spend Day ของวันที่ในอนาคตไม่ได้"
     items = _user_items(current_user)
     expense = sum(float(x.get("amount", 0)) for x in items if x.get("type") == "expense" and str(x.get("date", "")) == selected)
     if expense > 0:

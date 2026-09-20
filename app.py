@@ -33,7 +33,7 @@ from flask import (
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PAGES_DIR = os.path.join(HERE, "pages")
+PAGES_DIR = os.path.join(HERE, "pages_clean")
 UPLOAD_DIR = os.path.join(HERE, "static", "img")
 
 ALLOWED_UPLOAD = {
@@ -689,6 +689,20 @@ def page(name):
     # หน้า login/register เป็นหน้าสาธารณะ แต่เมื่อ login แล้วให้กลับหน้าแรก
     if name == "page1" and session.get("user"):
         return redirect(url_for("home"))
+
+    # ทุกหน้าของแอปเป็นข้อมูลส่วนตัว หน้าแรกและหน้าเข้าสู่ระบบเท่านั้นที่เป็นสาธารณะ
+    if name != "page1" and not session.get("user"):
+        login_module, login_error = load_page("page1")
+        if login_error:
+            return redirect(url_for("page", name="page1"))
+        context = login_module.build(dict(request.args)) or {}
+        return render_template(
+            "page1.html",
+            title=getattr(login_module, "TITLE", "เข้าสู่ระบบ"),
+            page="page1",
+            notice="กรุณาเข้าสู่ระบบเพื่อใช้งานแอป",
+            **context
+        ), 200
 
     # หน้าการเงินเปิดดูได้เพื่อให้ตัวตรวจงานของวิชาตรวจทุกหน้าได้ครบ 200.
     # การบันทึก/แก้ไข/ลบข้อมูลยังตรวจ session["user"] ภายในแต่ละ page module.

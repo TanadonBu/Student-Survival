@@ -30,14 +30,14 @@
       <span class="group-badge">{{ team.group.name }} · {{ team.group.section }}</span>
     </div>
   </div>
-  <nav class="wrap site-nav">
+  {% if current_user %}<nav class="wrap site-nav">
     <a href="{{ url_for('home') }}" class="{{ 'active' if request.path == '/' }}">หน้าแรก</a>
     {% for p in nav %}
       {% if p.name != 'page1' and not (p.name == 'page10' and not is_admin) and p.name != 'page8_old' %}
         <a href="{{ url_for('page', name=p.name) }}" class="{{ 'active' if request.path == '/' + p.name }}">{{ p.title }}</a>
       {% endif %}
     {% endfor %}
-  </nav>
+  </nav>{% endif %}
 </header>
 
 <main class="wrap">

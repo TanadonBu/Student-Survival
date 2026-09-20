@@ -4,6 +4,11 @@
       "username": "mudeng",
       "salt": "e309cffba5197b257281a7f564ef64ad",
       "password_hash": "641c386f6d8428e7f201752c556df80db34c319d0a2160810ac6ebff42da1a2e"
+    },
+    {
+      "username": "ooo",
+      "salt": "0abe7ab6800814d5d02dcf0dfc9bafc6",
+      "password_hash": "9a6c75ba572cae3841754f995c4f4aa4fb5492e295224c07e588c0d8efafef14"
     }
   ],
   "admin": {}

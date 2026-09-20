@@ -1,6 +1,7 @@
 """Student Survival planning lab: transactions, what-if tools and emergency reserve."""
 from datetime import date
 import json
+import math
 import os
 import storage
 from flask import session
@@ -50,6 +51,7 @@ def build(query=None):
     recommended = max(DEFAULT_TARGET, average * 7)
     reserve_gap = max(reserve_target - reserve_saved, 0)
     return {
+        "today_date": date.today().isoformat(),
         "items": sorted(items, key=lambda x: (x.get("date", ""), x.get("description", "")), reverse=True),
         "balance": budget.balance(),
         "daily": budget.daily_limit(20),
@@ -71,6 +73,8 @@ def handle(form):
     if action not in {"add", "delete", "reserve"}:
         return ""
     current_user = session.get("user")
+    if not current_user:
+        return "กรุณาเข้าสู่ระบบก่อนบันทึกข้อมูล"
     all_items = storage.load()
 
     if action == "add":
@@ -78,7 +82,7 @@ def handle(form):
             amount = float(form.get("amount", 0))
         except (TypeError, ValueError):
             return "กรุณากรอกจำนวนเงินเป็นตัวเลข"
-        if amount <= 0:
+        if not math.isfinite(amount) or amount <= 0:
             return "จำนวนเงินต้องมากกว่า 0"
         transaction_type = form.get("type", "expense")
         if transaction_type not in {"income", "expense"}:
@@ -87,8 +91,21 @@ def handle(form):
         if category not in CATEGORIES:
             category = "อื่น ๆ"
         note = str(form.get("description", "")).strip()[:80]
+        transaction_date = str(form.get("date") or date.today().isoformat())
+        try:
+            parsed_date = date.fromisoformat(transaction_date)
+        except ValueError:
+            return "รูปแบบวันที่ไม่ถูกต้อง"
+        if parsed_date > date.today():
+            return "ยังบันทึกรายการของวันที่ในอนาคตไม่ได้"
+        if transaction_type == "expense":
+            balance = StudentBudget(_user_items(current_user)).balance()
+            reserve_saved, _ = _load_reserve(current_user)
+            available = max(balance - reserve_saved, 0)
+            if amount > available + 1e-9:
+                return f"เงินพร้อมใช้ไม่พอ: ใช้ได้ ฿{available:,.2f} หลังกันเงินสำรอง จึงบันทึกรายจ่ายนี้ไม่ได้"
         all_items.append({
-            "date": form.get("date") or date.today().isoformat(),
+            "date": transaction_date,
             "type": transaction_type,
             "category": category,
             "amount": amount,
@@ -106,6 +123,12 @@ def handle(form):
             ordered = sorted(own_items, key=lambda x: (x.get("date", ""), x.get("description", "")), reverse=True)
             if 0 <= index < len(ordered):
                 target = ordered[index]
+                remaining = list(own_items)
+                remaining.remove(target)
+                remaining_balance = StudentBudget(remaining).balance()
+                reserve_saved, _ = _load_reserve(current_user)
+                if remaining_balance < reserve_saved - 1e-9:
+                    return "ลบรายรับนี้ไม่ได้ เพราะเงินที่เหลือจะไม่พอรองรับรายจ่ายและเงินสำรอง"
                 all_items.remove(target)
                 storage.save(all_items)
                 return "ลบรายการแล้ว"
@@ -119,8 +142,11 @@ def handle(form):
             target = float(form.get("reserve_target", DEFAULT_TARGET))
         except (TypeError, ValueError):
             return "กรุณากรอกเงินสำรองและเป้าหมายเป็นตัวเลข"
-        if saved < 0 or target <= 0:
+        if not math.isfinite(saved) or not math.isfinite(target) or saved < 0 or target <= 0:
             return "เงินสำรองต้องไม่ติดลบ และเป้าหมายต้องมากกว่า 0"
+        balance = StudentBudget(_user_items(current_user)).balance()
+        if saved > balance + 1e-9:
+            return f"เงินสำรองต้องไม่เกินเงินคงเหลือ ฿{balance:,.2f}"
         _save_reserve(current_user, saved, target)
         return "อัปเดตเงินสำรองฉุกเฉินแล้ว"
 

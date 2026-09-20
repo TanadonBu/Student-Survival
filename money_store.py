@@ -20,6 +20,7 @@ ACCOUNTS_FILE = os.path.join(ROOT, "accounts.json")
 RESERVE_FILE = os.path.join(ROOT, "emergency_reserve.json")
 GOALS_FILE = os.path.join(ROOT, "goals.json")
 NO_SPEND_FILE = os.path.join(ROOT, "no_spend_days.json")
+ALLOCATION_FILE = os.path.join(ROOT, "allocations.json")
 CATEGORIES = ["อาหาร", "เดินทาง", "การเรียน", "ที่พัก", "ความบันเทิง", "สุขภาพ", "อื่น ๆ"]
 LOCK = threading.RLock()
 
@@ -135,6 +136,46 @@ def usable_balance(username):
     return round(max(balance(username) - saved, 0), 2)
 
 
+def allocation(username):
+    """Return the user's saved allocation percentages."""
+    defaults = {"food": 40, "travel": 20, "study": 20, "reserve": 20}
+    values = _read(ALLOCATION_FILE, {})
+    entry = values.get(username, {}) if isinstance(values, dict) else {}
+    result = {}
+    for key, default in defaults.items():
+        try:
+            value = int(entry.get(key, default))
+        except (TypeError, ValueError):
+            value = default
+        result[key] = min(max(value, 0), 100)
+    if sum(result.values()) > 100:
+        return defaults
+    return result
+
+
+def save_allocation(username, submitted):
+    if not username:
+        raise MoneyError("กรุณาเข้าสู่ระบบก่อนบันทึกข้อมูล")
+    labels = {"food": "อาหาร", "travel": "เดินทาง", "study": "การเรียน", "reserve": "สำรอง"}
+    result = {}
+    for key, label in labels.items():
+        try:
+            value = int(submitted.get(key, 0))
+        except (TypeError, ValueError):
+            raise MoneyError(f"สัดส่วน{label}ต้องเป็นจำนวนเต็ม")
+        if value < 0 or value > 100:
+            raise MoneyError(f"สัดส่วน{label}ต้องอยู่ระหว่าง 0–100%")
+        result[key] = value
+    if sum(result.values()) > 100:
+        raise MoneyError("สัดส่วนรวมต้องไม่เกิน 100%")
+    with LOCK:
+        values = _read(ALLOCATION_FILE, {})
+        values = values if isinstance(values, dict) else {}
+        values[username] = result
+        _write(ALLOCATION_FILE, values)
+    return result
+
+
 def add_transaction(username, kind, amount, category, description, day_value):
     if not username:
         raise MoneyError("กรุณาเข้าสู่ระบบก่อนบันทึกข้อมูล")
@@ -188,6 +229,17 @@ def save_reserve(username, saved_value, target_value):
         values = values if isinstance(values, dict) else {}
         values[username] = {"saved": saved, "target": target}
         _write(RESERVE_FILE, values)
+
+
+def add_reserve(username, addition_value, target_value):
+    """Add money to the existing reserve without replacing its current value."""
+    addition = _amount(addition_value, "เงินที่บวกเพิ่ม")
+    if addition < 0:
+        raise MoneyError("เงินที่บวกเพิ่มต้องไม่ติดลบ")
+    current, _ = reserve(username)
+    new_saved = round(current + addition, 2)
+    save_reserve(username, new_saved, target_value)
+    return new_saved
 
 
 def goals(username):

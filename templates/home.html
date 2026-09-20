@@ -6,8 +6,10 @@
     <h1>จัดการเงินนักศึกษา<br><span>ให้ง่ายขึ้นในทุกวัน</span></h1>
     <p>เว็บช่วยวางแผนการเงินสำหรับนักศึกษา ตั้งแต่บันทึกรายรับ–รายจ่าย วิเคราะห์พฤติกรรม ไปจนถึงวางเป้าหมายและเงินสำรองฉุกเฉิน</p>
     <div class="hero-actions">
-      <a class="btn modern-primary" href="{{ url_for('page', name='page2') }}">เริ่มจัดการเงิน</a>
-      <a class="btn modern-secondary" href="{{ url_for('page', name='page3') }}">ดูแผนการเงิน</a>
+      {% if current_user %}<a class="btn modern-primary" href="{{ url_for('page', name='page2') }}">เริ่มจัดการเงิน</a>
+      <a class="btn modern-secondary" href="{{ url_for('page', name='page3') }}">ดูแผนการเงิน</a>{% else %}
+      <a class="btn modern-primary" href="{{ url_for('page', name='page1') }}">เข้าสู่ระบบเพื่อใช้งาน</a>
+      <a class="btn modern-secondary" href="{{ url_for('page', name='page1') }}?view=register">สมัครสมาชิก</a>{% endif %}
     </div>
     <div class="hero-trust"><span>✓ ใช้งานง่าย</span><span>✓ เหมาะกับนักศึกษา</span><span>✓ ข้อมูลเป็นส่วนตัว</span></div>
   </div>
@@ -18,6 +20,7 @@
     <div class="mock-goal"><span class="goal-icon">🎯</span><div><small>เป้าหมายใหม่</small><b>เงินสำรองฉุกเฉิน</b></div><strong>68%</strong></div>
   </div>
 </section>
+{% if not current_user %}<div class="login-required-note">🔒 ข้อมูลการเงินเป็นข้อมูลส่วนตัว กรุณาเข้าสู่ระบบก่อนเปิด Dashboard หรือเมนูอื่น</div>{% endif %}
 
 <section class="what-section">
   <div class="section-heading"><span class="section-kicker">WHAT YOU CAN DO</span><h2>เว็บนี้ช่วยอะไรคุณได้บ้าง?</h2><p>รวมเครื่องมือสำคัญไว้ในที่เดียว เพื่อให้คุณเห็นภาพการเงินของตัวเองได้ชัดขึ้น</p></div>

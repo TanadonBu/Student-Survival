@@ -22,7 +22,7 @@
   <section class="sv-account-card">
     <h2>เข้าสู่ระบบ</h2>
     <p class="muted">กลับมาใช้แผนการเงินของคุณ</p>
-    <form method="post">
+    <form method="post" action="{{ url_for('page', name='page1') }}">
       <input type="hidden" name="action" value="login">
       <label>ชื่อผู้ใช้<input name="username" required autocomplete="username"></label>
       <label>รหัสผ่าน<input type="password" name="password" required autocomplete="current-password"></label>
@@ -33,7 +33,7 @@
   <section class="sv-account-card">
     <h2>สมัครสมาชิก</h2>
     <p class="muted">สร้างบัญชีใหม่เพื่อเริ่มบันทึกข้อมูล</p>
-    <form method="post">
+    <form method="post" action="{{ url_for('page', name='page1') }}">
       <input type="hidden" name="action" value="register">
       <label>ชื่อผู้ใช้<input name="username" minlength="3" maxlength="30" required autocomplete="username"></label>
       <label>รหัสผ่าน<input type="password" name="password" minlength="6" required autocomplete="new-password"></label>

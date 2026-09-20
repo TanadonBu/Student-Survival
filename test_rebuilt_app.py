@@ -11,6 +11,7 @@ def _files(tmp_path, monkeypatch):
         "RESERVE_FILE": tmp_path / "reserve.json",
         "GOALS_FILE": tmp_path / "goals.json",
         "NO_SPEND_FILE": tmp_path / "no-spend.json",
+        "ALLOCATION_FILE": tmp_path / "allocations.json",
     }
     for name, path in paths.items():
         monkeypatch.setattr(store, name, str(path))
@@ -19,6 +20,7 @@ def _files(tmp_path, monkeypatch):
     paths["RESERVE_FILE"].write_text("{}", encoding="utf-8")
     paths["GOALS_FILE"].write_text("[]", encoding="utf-8")
     paths["NO_SPEND_FILE"].write_text("{}", encoding="utf-8")
+    paths["ALLOCATION_FILE"].write_text("{}", encoding="utf-8")
 
 
 def _login(client):
@@ -64,3 +66,40 @@ def test_goal_ids_prevent_cross_user_edits(tmp_path, monkeypatch):
         assert False, "another user must not edit this goal"
     except store.MoneyError:
         pass
+
+
+def test_reserve_addition_is_added_to_existing_value(tmp_path, monkeypatch):
+    _files(tmp_path, monkeypatch)
+    store.add_transaction("alice", "income", 1000, "อื่น ๆ", "income", "2026-09-01")
+    store.save_reserve("alice", 200, 800)
+
+    assert store.add_reserve("alice", 150, 800) == 350
+    assert store.reserve("alice") == (350, 800)
+
+
+def test_reserve_addition_cannot_make_reserve_exceed_balance(tmp_path, monkeypatch):
+    _files(tmp_path, monkeypatch)
+    store.add_transaction("alice", "income", 500, "อื่น ๆ", "income", "2026-09-01")
+    store.save_reserve("alice", 400, 800)
+
+    try:
+        store.add_reserve("alice", 101, 800)
+        assert False, "reserve must not exceed the real balance"
+    except store.MoneyError:
+        pass
+    assert store.reserve("alice") == (400, 800)
+
+
+def test_allocation_is_saved_per_user_and_cannot_exceed_100(tmp_path, monkeypatch):
+    _files(tmp_path, monkeypatch)
+    saved = store.save_allocation("alice", {"food": "35", "travel": "20", "study": "15", "reserve": "25"})
+    assert sum(saved.values()) == 95
+    assert store.allocation("alice") == {"food": 35, "travel": 20, "study": 15, "reserve": 25}
+    assert store.allocation("bob") == {"food": 40, "travel": 20, "study": 20, "reserve": 20}
+
+    try:
+        store.save_allocation("alice", {"food": "50", "travel": "30", "study": "20", "reserve": "1"})
+        assert False, "allocation total must not exceed 100 percent"
+    except store.MoneyError:
+        pass
+    assert sum(store.allocation("alice").values()) == 95
