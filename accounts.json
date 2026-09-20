@@ -1,0 +1,10 @@
+{
+  "users": [
+    {
+      "username": "mudeng",
+      "salt": "e309cffba5197b257281a7f564ef64ad",
+      "password_hash": "641c386f6d8428e7f201752c556df80db34c319d0a2160810ac6ebff42da1a2e"
+    }
+  ],
+  "admin": {}
+}

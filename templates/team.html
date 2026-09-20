@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-box">
+  <h1>👥 {{ group.name }}</h1>
+  <p class="lead">{{ group.topic }} — {{ group.description }}</p>
+</section>
+
+<section class="panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div>
+      <h2 style="margin:0">สมาชิกกลุ่ม</h2>
+      <p class="muted" style="margin:6px 0 0">สมาชิก 3 คน · ทุกคนมีส่วนร่วมในการพัฒนาโครงงาน</p>
+    </div>
+    <span class="group-badge">หัวหน้ากลุ่ม: กฤษดา โพธิ์ศรี</span>
+  </div>
+
+  <div class="member-grid">
+    {% for m in members %}
+    <div class="member" style="position:relative">
+      {% if loop.first %}
+      <div style="position:absolute;top:14px;right:14px;background:#8f1838;color:#fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700">หัวหน้ากลุ่ม</div>
+      {% endif %}
+      <div class="avatar">{{ m.initial }}</div>
+      <div class="member-name">{{ m.name }}</div>
+      <div class="muted">รหัสนักศึกษา: {{ m.id }}</div>
+      <div class="role">{{ 'หัวหน้ากลุ่ม · สมาชิก' if loop.first else 'สมาชิก' }}</div>
+      <div class="task">{{ m.task }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="panel">
+  <h2 style="margin-top:0">บทบาทและงาน</h2>
+  <p class="note">สมาชิกทุกคนมีบทบาทในการพัฒนาโครงงานร่วมกัน โดยกฤษดารับหน้าที่หัวหน้ากลุ่มเพื่อประสานงานและดูภาพรวม ส่วนงานพัฒนาแบ่งตามฟีเจอร์เพื่อให้ความรับผิดชอบมีความสมดุล</p>
+  <div style="overflow-x:auto">
+    <table>
+      <tr>
+        <th>ชื่อ</th>
+        <th>รหัสนักศึกษา</th>
+        <th>บทบาท</th>
+        <th>งานที่รับผิดชอบ</th>
+      </tr>
+      {% for m in members %}
+      <tr>
+        <td>{{ m.name }}</td>
+        <td>{{ m.id }}</td>
+        <td>{{ 'หัวหน้ากลุ่ม · สมาชิก' if loop.first else 'สมาชิก' }}</td>
+        <td>{{ m.task }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</section>
+{% endblock %}
